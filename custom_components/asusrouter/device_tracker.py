@@ -131,10 +131,17 @@ class ARDeviceEntity(ScannerEntity):
         return SourceType.ROUTER
 
     @property
-    def is_connected(self) -> bool | None:
-        """Device status."""
+    def is_connected(self) -> bool:
+        """Device status.
 
-        return self._client.state
+        Return a strict boolean. When the underlying client state is
+        unknown (e.g. right after a HA restart for a device that has not
+        reconnected yet), `self._client.state` is `None`. Newer Home
+        Assistant versions surface that as an "unknown" state instead of
+        "not_home", so we explicitly fall back to `False` (not_home).
+        """
+
+        return self._client.state is True
 
     @property
     def ip_address(self) -> str | None:
